@@ -31,7 +31,7 @@ export default function RecommendationsPanel({ projectId }: RecommendationsPanel
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/recommendations/${projectId}`)
+        const response = await axios.get(`https://legacy-code-backend.onrender.com/recommendations/${projectId}`)
         setRecommendations(response.data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch recommendations')

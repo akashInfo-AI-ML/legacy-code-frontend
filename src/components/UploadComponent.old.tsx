@@ -69,7 +69,7 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
     formData.append('file', file)
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/upload`, formData, {
+      const response = await axios.post(`https://legacy-code-backend.onrender.com/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           const progress = progressEvent.total
@@ -98,9 +98,9 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
   return (
     <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
       {/* Hero Section */}
-      <Box 
-        sx={{ 
-          textAlign: 'center', 
+      <Box
+        sx={{
+          textAlign: 'center',
           mb: 6,
           py: 8,
           background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
@@ -141,7 +141,7 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
             animationDelay: '1s'
           }}
         />
-        
+
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <Typography
             variant="h2"
@@ -159,10 +159,10 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
           >
             Project ATLAS
           </Typography>
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              mb: 3, 
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 3,
               color: 'rgba(255,255,255,0.8)',
               fontWeight: 300,
               animation: 'slideUp 0.8s ease-out 0.2s backwards'
@@ -170,11 +170,11 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
           >
             Legacy .NET Intelligence Platform
           </Typography>
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: 'rgba(255,255,255,0.6)', 
-              maxWidth: 700, 
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'rgba(255,255,255,0.6)',
+              maxWidth: 700,
               mx: 'auto',
               fontSize: '1.1rem',
               lineHeight: 1.8,
@@ -190,21 +190,21 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
       {/* Feature Cards with 3D effect */}
       <Grid container spacing={3} sx={{ mb: 6 }}>
         {[
-          { 
-            icon: '⚡', 
-            title: 'Lightning Fast', 
+          {
+            icon: '⚡',
+            title: 'Lightning Fast',
             desc: 'AI-powered analysis in seconds',
             delay: '0s'
           },
-          { 
-            icon: '🔒', 
-            title: 'Enterprise Secure', 
+          {
+            icon: '🔒',
+            title: 'Enterprise Secure',
             desc: 'Your code never leaves your infrastructure',
             delay: '0.1s'
           },
-          { 
-            icon: '🎯', 
-            title: 'Actionable Insights', 
+          {
+            icon: '🎯',
+            title: 'Actionable Insights',
             desc: 'Strategic modernization roadmap',
             delay: '0.2s'
           }
@@ -248,10 +248,10 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
               <Typography sx={{ fontSize: '3rem', mb: 2, position: 'relative', zIndex: 1 }}>
                 {feature.icon}
               </Typography>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  mb: 1.5, 
+              <Typography
+                variant="h6"
+                sx={{
+                  mb: 1.5,
                   fontWeight: 700,
                   color: 'white',
                   position: 'relative',
@@ -260,9 +260,9 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
               >
                 {feature.title}
               </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
+              <Typography
+                variant="body2"
+                sx={{
                   color: 'rgba(255,255,255,0.7)',
                   lineHeight: 1.7,
                   position: 'relative',
@@ -315,7 +315,7 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
             left: '-50%',
             width: '200%',
             height: '200%',
-            background: dragActive 
+            background: dragActive
               ? 'radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%)'
               : 'none',
             animation: dragActive ? 'rotate 10s linear infinite' : 'none'
@@ -356,20 +356,20 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
             </Fade>
           ) : (
             <Box sx={{ position: 'relative', zIndex: 1 }}>
-              <CloudUploadIcon 
+              <CloudUploadIcon
                 className="upload-icon"
-                sx={{ 
-                  fontSize: 100, 
-                  color: '#667eea', 
+                sx={{
+                  fontSize: 100,
+                  color: '#667eea',
                   mb: 3,
                   transition: 'all 0.3s ease',
                   filter: 'drop-shadow(0 0 20px rgba(102, 126, 234, 0.5))'
-                }} 
+                }}
               />
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  mb: 2, 
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
                   fontWeight: 700,
                   color: 'white',
                   textShadow: '0 0 20px rgba(102, 126, 234, 0.5)'
@@ -377,9 +377,9 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
               >
                 Drop Your Solution Here
               </Typography>
-              <Typography 
-                variant="body1" 
-                sx={{ 
+              <Typography
+                variant="body1"
+                sx={{
                   mb: 3,
                   color: 'rgba(255,255,255,0.7)',
                   fontSize: '1.1rem'
@@ -398,9 +398,9 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
                   backdropFilter: 'blur(10px)'
                 }}
               >
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
+                <Typography
+                  variant="caption"
+                  sx={{
                     color: 'rgba(255,255,255,0.8)',
                     fontWeight: 500,
                     letterSpacing: '0.5px'
@@ -416,8 +416,8 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
 
       {loading && (
         <Fade in={true}>
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               mb: 3,
               p: 3,
               background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
@@ -433,9 +433,9 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
                   Analyzing Your Code...
                 </Typography>
               </Box>
-              <Typography 
-                variant="h6" 
-                sx={{ 
+              <Typography
+                variant="h6"
+                sx={{
                   fontWeight: 700,
                   color: '#667eea',
                   textShadow: '0 0 10px rgba(102, 126, 234, 0.5)'

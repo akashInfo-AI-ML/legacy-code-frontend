@@ -70,7 +70,7 @@ export default function EffortEstimationPanel({ projectId }: EffortEstimationPan
     useEffect(() => {
         const fetchEffortEstimate = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/effort-estimate/${projectId}`)
+                const response = await axios.get(`https://legacy-code-backend.onrender.com/effort-estimate/${projectId}`)
                 setData(response.data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to fetch effort estimate')

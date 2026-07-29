@@ -30,7 +30,7 @@ export default function HealthScorePanel({ projectId }: HealthScorePanelProps) {
   useEffect(() => {
     const fetchHealth = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/health/${projectId}`)
+        const response = await axios.get(`https://legacy-code-backend.onrender.com/health/${projectId}`)
         setHealth(response.data)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch health score')

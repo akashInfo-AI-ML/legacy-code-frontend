@@ -56,14 +56,14 @@ export default function ArchitectureViewer({ projectId }: ArchitectureViewerProp
     const fetchData = async () => {
       try {
         // First scan
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/scan/${projectId}`)
+        await axios.post(`https://legacy-code-backend.onrender.com/scan/${projectId}`)
 
         // Get architecture
-        const archResponse = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/architecture/${projectId}`)
+        const archResponse = await axios.get(`https://legacy-code-backend.onrender.com/architecture/${projectId}`)
         setArchitecture(archResponse.data)
 
         // Get AI analysis for architecture patterns
-        const aiResponse = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/ai/analyze`, {
+        const aiResponse = await axios.post(`https://legacy-code-backend.onrender.com/ai/analyze`, {
           project_id: projectId,
           context: 'Architecture analysis and modernization recommendations'
         })
