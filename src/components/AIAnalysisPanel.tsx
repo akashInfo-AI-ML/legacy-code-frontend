@@ -31,7 +31,7 @@ export default function AIAnalysisPanel({ projectId }: AIAnalysisPanelProps) {
   useEffect(() => {
     const fetchAnalysis = async () => {
       try {
-        const response = await axios.post('http://localhost:8000/ai/analyze', {
+        const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/ai/analyze`, {
           project_id: projectId,
           context: 'Legacy .NET application analysis'
         })

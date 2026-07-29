@@ -83,7 +83,7 @@ export default function MigrationRoadmapPanel({ projectId }: MigrationRoadmapPan
     useEffect(() => {
         const fetchRoadmap = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/migration-roadmap/${projectId}`)
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/migration-roadmap/${projectId}`)
                 setData(response.data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to fetch migration roadmap')

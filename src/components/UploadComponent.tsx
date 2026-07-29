@@ -68,7 +68,7 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
     formData.append('file', file)
 
     try {
-      const response = await axios.post('http://localhost:8000/upload', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           const progress = progressEvent.total

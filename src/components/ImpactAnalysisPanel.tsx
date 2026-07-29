@@ -42,7 +42,7 @@ export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelPr
   const handleAnalyze = async () => {
     setLoading(true)
     try {
-      const response = await axios.post('http://localhost:8000/impact', {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/impact`, {
         project_id: projectId,
         change_scope: changeScope,
         affected_modules: selectedModules

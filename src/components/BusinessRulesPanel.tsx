@@ -81,7 +81,7 @@ export default function BusinessRulesPanel({ projectId }: BusinessRulesPanelProp
     useEffect(() => {
         const fetchBusinessRules = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/business-rules/${projectId}`)
+                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/business-rules/${projectId}`)
                 setData(response.data)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to fetch business rules')
