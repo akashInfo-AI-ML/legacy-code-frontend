@@ -23,13 +23,16 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ease-smooth ${scrolled
-          ? 'bg-ink-950/80 backdrop-blur-2xl border-b border-white/[0.06] py-0'
-          : 'bg-transparent py-0'
+        ? 'bg-ink-950/80 backdrop-blur-2xl border-b border-white/[0.06] py-0'
+        : 'bg-transparent py-0'
         }`}
     >
       <nav className="max-w-7xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2.5 group">
+        <button
+          onClick={() => (window as any).navigateTo?.('/')}
+          className="flex items-center gap-2.5 group cursor-pointer bg-transparent border-0 p-0"
+        >
           <span className="relative grid place-items-center w-9 h-9 rounded-xl bg-gradient-to-br from-atlas-400 to-indigo-500 shadow-lg shadow-atlas-500/20">
             <Compass className="w-[18px] h-[18px] text-white" strokeWidth={2.5} />
             <span className="absolute inset-0 rounded-xl bg-atlas-400/40 blur-md -z-10 group-hover:bg-atlas-400/70 transition-all duration-500" />
@@ -37,7 +40,7 @@ export default function Navbar() {
           <span className="font-bold text-[15px] tracking-tight">
             <span className="text-atlas-400">ATLAS</span>
           </span>
-        </a>
+        </button>
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-1">

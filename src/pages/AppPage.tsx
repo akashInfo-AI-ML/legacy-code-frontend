@@ -76,10 +76,13 @@ export default function AppPage() {
           {/* Top Bar */}
           <div className="h-16 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <a href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors duration-200">
+              <button
+                onClick={() => (window as any).navigateTo?.('/')}
+                className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors duration-200 cursor-pointer bg-transparent border-0 p-0"
+              >
                 <ArrowLeft className="w-4 h-4" />
                 <span className="text-sm hidden sm:inline">Back</span>
-              </a>
+              </button>
               <div className="w-px h-6 bg-white/10 hidden sm:block" />
               <div className="flex items-center gap-3">
                 <div className="grid place-items-center w-8 h-8 rounded-lg bg-gradient-to-br from-atlas-400 to-indigo-500">
@@ -117,10 +120,10 @@ export default function AppPage() {
                     onClick={() => !isDisabled && handleNavClick(item.id)}
                     disabled={isDisabled}
                     className={`relative flex items-center gap-2 px-4 py-3 text-[13px] font-medium rounded-t-lg transition-all duration-300 whitespace-nowrap ${isActive
-                        ? 'text-white bg-ink-950/50'
-                        : isDisabled
-                          ? 'text-slate-600 cursor-not-allowed'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      ? 'text-white bg-ink-950/50'
+                      : isDisabled
+                        ? 'text-slate-600 cursor-not-allowed'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
                       }`}
                   >
                     <span className={isActive ? 'text-atlas-400' : ''}>{item.icon}</span>
@@ -160,10 +163,10 @@ export default function AppPage() {
                           onClick={() => !isDisabled && handleNavClick(item.id)}
                           disabled={isDisabled}
                           className={`w-full flex items-center gap-3 px-4 py-3 text-[13px] font-medium transition-colors border-b border-white/5 last:border-0 ${isActive
-                              ? 'text-white bg-atlas-500/10'
-                              : isDisabled
-                                ? 'text-slate-600 cursor-not-allowed opacity-40'
-                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            ? 'text-white bg-atlas-500/10'
+                            : isDisabled
+                              ? 'text-slate-600 cursor-not-allowed opacity-40'
+                              : 'text-slate-400 hover:text-white hover:bg-white/5'
                             }`}
                         >
                           <span className={isActive ? 'text-atlas-400' : ''}>{item.icon}</span>

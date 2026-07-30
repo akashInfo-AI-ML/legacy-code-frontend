@@ -20,13 +20,13 @@ export default function FinalCta() {
           </p>
 
           <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3.5">
-            <a
-              href="/app"
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-atlas-400 to-indigo-500 text-white font-semibold px-8 py-4 text-[15px] glow-cyan hover:brightness-110 transition-all duration-300"
+            <button
+              onClick={() => (window as any).navigateTo?.('/app')}
+              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-atlas-400 to-indigo-500 text-white font-semibold px-8 py-4 text-[15px] glow-cyan hover:brightness-110 transition-all duration-300 cursor-pointer"
             >
               Try it now
               <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform duration-300" />
-            </a>
+            </button>
             <a
               href="#how"
               className="inline-flex items-center gap-2 rounded-full border border-white/12 text-slate-200 font-medium px-6 py-4 text-[15px] hover:bg-white/[0.04] hover:border-white/20 transition-all duration-300"

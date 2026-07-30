@@ -35,13 +35,13 @@ export default function Hero() {
             </p>
 
             <div className="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-3.5 animate-fade-up" style={{ animationDelay: '0.2s' }}>
-              <a
-                href="/app"
-                className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-atlas-400 to-indigo-500 text-white font-semibold px-7 py-3.5 text-[15px] glow-cyan hover:brightness-110 transition-all duration-300"
+              <button
+                onClick={() => (window as any).navigateTo?.('/app')}
+                className="group relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-atlas-400 to-indigo-500 text-white font-semibold px-7 py-3.5 text-[15px] glow-cyan hover:brightness-110 transition-all duration-300 cursor-pointer"
               >
                 Try it now
                 <ArrowRight className="w-[18px] h-[18px] group-hover:translate-x-0.5 transition-transform duration-300" />
-              </a>
+              </button>
               <a
                 href="#how"
                 className="inline-flex items-center gap-2 rounded-full border border-white/12 text-slate-200 font-medium px-6 py-3.5 text-[15px] hover:bg-white/[0.04] hover:border-white/20 transition-all duration-300"
