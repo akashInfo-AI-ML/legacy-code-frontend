@@ -1,512 +1,477 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import {
-  Box,
-  Typography,
-  CircularProgress,
-  Paper,
-  Grid,
-  Chip,
-  Card,
-  CardContent,
-  Tabs,
-  Tab,
-  Alert,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider
-} from '@mui/material'
-import {
-  CheckCircle as CheckIcon,
-  Warning as WarningIcon,
-  TrendingUp as ImprovementIcon,
-  Architecture as ArchIcon,
-  ArrowForward as ArrowIcon
-} from '@mui/icons-material'
-import axios from 'axios'
+    Loader2,
+    CheckCircle,
+    AlertTriangle,
+    TrendingUp,
+    Layers,
+    ArrowDown,
+    Package,
+    GitBranch,
+    Target,
+    Zap,
+} from 'lucide-react';
 
 interface ArchitectureViewerProps {
-  projectId: string
+    projectId: string;
 }
 
 interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
+    children?: React.ReactNode;
+    index: number;
+    value: number;
 }
 
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
-  return (
-    <div role="tabpanel" hidden={value !== index} {...other}>
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  )
+function TabPanel({ children, value, index }: TabPanelProps) {
+    return (
+        <div role="tabpanel" hidden={value !== index}>
+            {value === index && <div className="py-6">{children}</div>}
+        </div>
+    );
 }
 
 export default function ArchitectureViewer({ projectId }: ArchitectureViewerProps) {
-  const [loading, setLoading] = useState(true)
-  const [architecture, setArchitecture] = useState<any>(null)
-  const [aiAnalysis, setAiAnalysis] = useState<any>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [tabValue, setTabValue] = useState(0)
+    const [loading, setLoading] = useState(true);
+    const [architecture, setArchitecture] = useState<any>(null);
+    const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [tabValue, setTabValue] = useState(0);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // First scan
-        await axios.post(`https://legacy-code-backend.onrender.com/scan/${projectId}`)
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // First scan
+                await axios.post(`https://legacy-code-backend.onrender.com/scan/${projectId}`);
 
-        // Get architecture
-        const archResponse = await axios.get(`https://legacy-code-backend.onrender.com/architecture/${projectId}`)
-        setArchitecture(archResponse.data)
+                // Get architecture
+                const archResponse = await axios.get(
+                    `https://legacy-code-backend.onrender.com/architecture/${projectId}`
+                );
+                setArchitecture(archResponse.data);
 
-        // Get AI analysis for architecture patterns
-        const aiResponse = await axios.post(`https://legacy-code-backend.onrender.com/ai/analyze`, {
-          project_id: projectId,
-          context: 'Architecture analysis and modernization recommendations'
-        })
-        setAiAnalysis(aiResponse.data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch architecture data')
-      } finally {
-        setLoading(false)
-      }
+                // Get AI analysis for architecture patterns
+                const aiResponse = await axios.post(
+                    `https://legacy-code-backend.onrender.com/ai/analyze`,
+                    {
+                        project_id: projectId,
+                        context: 'Architecture analysis and modernization recommendations',
+                    }
+                );
+                setAiAnalysis(aiResponse.data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to fetch architecture data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [projectId]);
+
+    if (loading) {
+        return (
+            <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
+                <Loader2 className="w-14 h-14 text-atlas-400 animate-spin" />
+                <p className="text-[15px] text-slate-400">Analyzing architecture...</p>
+            </div>
+        );
     }
 
-    fetchData()
-  }, [projectId])
+    if (error) {
+        return (
+            <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
+                <p className="text-[14px] text-red-300">{error}</p>
+            </div>
+        );
+    }
 
-  if (loading) {
+    const currentArch = aiAnalysis?.current_architecture || {};
+    const recommendedArch = aiAnalysis?.recommended_architecture || {};
+
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: 400, gap: 2 }}>
-        <CircularProgress size={60} />
-        <Typography variant="body1" color="text.secondary">
-          Analyzing architecture...
-        </Typography>
-      </Box>
-    )
-  }
+        <div className="w-full">
+            {/* Header */}
+            <div className="mb-8">
+                <span className="inline-flex items-center gap-2 text-atlas-400 text-[12.5px] font-semibold tracking-[0.08em] uppercase mb-3">
+                    <span className="w-6 h-px bg-atlas-400/50" />
+                    Analysis Results
+                    <span className="w-6 h-px bg-atlas-400/50" />
+                </span>
+                <h2 className="text-2xl sm:text-[2.2rem] font-bold tracking-[-0.02em] leading-tight bg-gradient-to-r from-atlas-400 to-indigo-500 bg-clip-text text-transparent">
+                    Architecture Analysis
+                </h2>
+                <p className="mt-3 text-slate-400 text-[15px] leading-[1.65]">
+                    Comprehensive analysis of your current architecture with modernization recommendations
+                </p>
+            </div>
 
-  if (error) {
-    return <Alert severity="error">{error}</Alert>
-  }
+            {/* Metrics Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="rounded-2xl border border-white/[0.07] bg-ink-800/40 p-5 hover:border-atlas-400/30 transition-all duration-300">
+                    <div className="flex items-start justify-between mb-2">
+                        <Package className="w-5 h-5 text-atlas-400" />
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-1">
+                        {architecture?.nodes?.length || 0}
+                    </div>
+                    <div className="text-[13px] text-slate-400">Components</div>
+                </div>
 
-  const currentArch = aiAnalysis?.current_architecture || {}
-  const recommendedArch = aiAnalysis?.recommended_architecture || {}
+                <div className="rounded-2xl border border-white/[0.07] bg-ink-800/40 p-5 hover:border-atlas-400/30 transition-all duration-300">
+                    <div className="flex items-start justify-between mb-2">
+                        <GitBranch className="w-5 h-5 text-atlas-400" />
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-1">
+                        {architecture?.edges?.length || 0}
+                    </div>
+                    <div className="text-[13px] text-slate-400">Dependencies</div>
+                </div>
 
-  return (
-    <Box>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: 1,
-          fontWeight: 700,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}
-      >
-        Architecture Analysis
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-        Comprehensive analysis of your current architecture with modernization recommendations
-      </Typography>
+                <div className="rounded-2xl border border-white/[0.07] bg-ink-800/40 p-5 hover:border-atlas-400/30 transition-all duration-300">
+                    <div className="flex items-start justify-between mb-2">
+                        <AlertTriangle className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div className="text-3xl font-bold text-amber-400 mb-1">
+                        {architecture?.metrics?.cyclic_complexity || 0}
+                    </div>
+                    <div className="text-[13px] text-slate-400">Circular Dependencies</div>
+                </div>
 
-      {/* Metrics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 2 }}>
-            <CardContent>
-              <Typography variant="h3" sx={{ fontWeight: 700, color: '#667eea', mb: 1 }}>
-                {architecture?.nodes?.length || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Components
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 2 }}>
-            <CardContent>
-              <Typography variant="h3" sx={{ fontWeight: 700, color: '#667eea', mb: 1 }}>
-                {architecture?.edges?.length || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Dependencies
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 2 }}>
-            <CardContent>
-              <Typography variant="h3" sx={{ fontWeight: 700, color: '#ff9800', mb: 1 }}>
-                {architecture?.metrics?.cyclic_complexity || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Circular Dependencies
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 2 }}>
-            <CardContent>
-              <Typography variant="h3" sx={{ fontWeight: 700, color: '#4caf50', mb: 1 }}>
-                {architecture?.layers?.length || 0}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Architectural Layers
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                <div className="rounded-2xl border border-white/[0.07] bg-ink-800/40 p-5 hover:border-atlas-400/30 transition-all duration-300">
+                    <div className="flex items-start justify-between mb-2">
+                        <Layers className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div className="text-3xl font-bold text-emerald-400 mb-1">
+                        {architecture?.layers?.length || 0}
+                    </div>
+                    <div className="text-[13px] text-slate-400">Architectural Layers</div>
+                </div>
+            </div>
 
-      {/* Architecture Comparison Tabs */}
-      <Paper elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: 2 }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
-            <Tab label="Current Architecture" />
-            <Tab label="Recommended Architecture" />
-            <Tab label="Migration Path" />
-          </Tabs>
-        </Box>
+            {/* Tabs */}
+            <div className="rounded-2xl border border-white/[0.07] bg-ink-800/40 overflow-hidden">
+                {/* Tab Headers */}
+                <div className="border-b border-white/[0.07] bg-ink-900/50">
+                    <div className="flex">
+                        <button
+                            onClick={() => setTabValue(0)}
+                            className={`flex-1 px-6 py-4 text-[14px] font-semibold transition-all duration-300 ${tabValue === 0
+                                    ? 'text-atlas-400 border-b-2 border-atlas-400 bg-atlas-500/[0.05]'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/[0.02]'
+                                }`}
+                        >
+                            Current Architecture
+                        </button>
+                        <button
+                            onClick={() => setTabValue(1)}
+                            className={`flex-1 px-6 py-4 text-[14px] font-semibold transition-all duration-300 ${tabValue === 1
+                                    ? 'text-atlas-400 border-b-2 border-atlas-400 bg-atlas-500/[0.05]'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/[0.02]'
+                                }`}
+                        >
+                            Recommended Architecture
+                        </button>
+                        <button
+                            onClick={() => setTabValue(2)}
+                            className={`flex-1 px-6 py-4 text-[14px] font-semibold transition-all duration-300 ${tabValue === 2
+                                    ? 'text-atlas-400 border-b-2 border-atlas-400 bg-atlas-500/[0.05]'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/[0.02]'
+                                }`}
+                        >
+                            Migration Path
+                        </button>
+                    </div>
+                </div>
 
-        {/* Current Architecture Tab */}
-        <TabPanel value={tabValue} index={0}>
-          <Box sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <WarningIcon sx={{ fontSize: 40, color: '#ff9800' }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {currentArch.pattern || 'Current Architecture Pattern'}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {currentArch.description || 'Analyzing current architecture...'}
-                </Typography>
-              </Box>
-            </Box>
+                {/* Tab Content */}
+                <div className="p-6">
+                    {/* Current Architecture Tab */}
+                    <TabPanel value={tabValue} index={0}>
+                        <div className="space-y-6">
+                            {/* Header */}
+                            <div className="flex items-start gap-4">
+                                <div className="grid place-items-center w-12 h-12 rounded-xl bg-amber-500/15 text-amber-400 shrink-0">
+                                    <AlertTriangle className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white mb-1">
+                                        {currentArch.pattern || 'Current Architecture Pattern'}
+                                    </h3>
+                                    <p className="text-[14px] text-slate-400 leading-[1.6]">
+                                        {currentArch.description || 'Analyzing current architecture...'}
+                                    </p>
+                                </div>
+                            </div>
 
-            {/* Current Architecture Diagram */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 4,
-                mb: 3,
-                backgroundColor: '#fafafa',
-                border: '2px dashed #e0e0e0',
-                borderRadius: 2
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 600, textAlign: 'center' }}>
-                Current Architecture Layers
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 600, margin: '0 auto' }}>
-                {currentArch.layers && currentArch.layers.length > 0 ? (
-                  currentArch.layers.map((layer: string, index: number) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 2,
-                        backgroundColor: 'white',
-                        border: '2px solid #667eea',
-                        borderRadius: 1,
-                        textAlign: 'center',
-                        fontWeight: 600,
-                        position: 'relative'
-                      }}
-                    >
-                      {layer}
-                      {index < currentArch.layers.length - 1 && (
-                        <ArrowIcon
-                          sx={{
-                            position: 'absolute',
-                            bottom: -24,
-                            left: '50%',
-                            transform: 'translateX(-50%) rotate(90deg)',
-                            color: '#667eea'
-                          }}
-                        />
-                      )}
-                    </Box>
-                  ))
-                ) : (
-                  <Typography color="text.secondary" textAlign="center">
-                    Analyzing architecture layers...
-                  </Typography>
-                )}
-              </Box>
-            </Paper>
+                            {/* Architecture Diagram */}
+                            <div className="rounded-2xl border-2 border-dashed border-white/10 bg-ink-900/50 p-8">
+                                <p className="text-[13px] font-semibold text-center text-slate-300 mb-6">
+                                    Current Architecture Layers
+                                </p>
+                                <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+                                    {currentArch.layers && currentArch.layers.length > 0 ? (
+                                        currentArch.layers.map((layer: string, index: number) => (
+                                            <div key={index} className="relative">
+                                                <div className="rounded-xl border-2 border-atlas-400/50 bg-ink-800 p-4 text-center font-semibold text-white">
+                                                    {layer}
+                                                </div>
+                                                {index < currentArch.layers.length - 1 && (
+                                                    <div className="flex justify-center my-2">
+                                                        <ArrowDown className="w-5 h-5 text-atlas-400" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-center text-slate-400 text-[14px]">
+                                            Analyzing architecture layers...
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
 
-            {/* Issues */}
-            {currentArch.issues && currentArch.issues.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#d32f2f' }}>
-                  Issues & Concerns:
-                </Typography>
-                <List>
-                  {currentArch.issues.map((issue: string, index: number) => (
-                    <ListItem key={index}>
-                      <ListItemIcon>
-                        <WarningIcon sx={{ color: '#ff9800' }} />
-                      </ListItemIcon>
-                      <ListItemText primary={issue} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
+                            {/* Issues */}
+                            {currentArch.issues && currentArch.issues.length > 0 && (
+                                <div>
+                                    <h4 className="text-[15px] font-semibold text-red-400 mb-3">
+                                        Issues & Concerns:
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {currentArch.issues.map((issue: string, index: number) => (
+                                            <div
+                                                key={index}
+                                                className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3"
+                                            >
+                                                <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                                                <p className="text-[13px] text-slate-300 leading-[1.6]">{issue}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Metrics */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="rounded-xl border border-white/[0.07] bg-ink-900/50 p-4 text-center">
+                                    <p className="text-[13px] text-slate-400 mb-2">Coupling Level</p>
+                                    <span
+                                        className={`inline-block px-3 py-1 rounded-full text-[12px] font-semibold ${currentArch.coupling === 'high'
+                                                ? 'bg-red-500/20 text-red-400'
+                                                : 'bg-amber-500/20 text-amber-400'
+                                            }`}
+                                    >
+                                        {currentArch.coupling || 'Medium'}
+                                    </span>
+                                </div>
+                                <div className="rounded-xl border border-white/[0.07] bg-ink-900/50 p-4 text-center">
+                                    <p className="text-[13px] text-slate-400 mb-2">Cohesion Level</p>
+                                    <span
+                                        className={`inline-block px-3 py-1 rounded-full text-[12px] font-semibold ${currentArch.cohesion === 'low'
+                                                ? 'bg-red-500/20 text-red-400'
+                                                : 'bg-emerald-500/20 text-emerald-400'
+                                            }`}
+                                    >
+                                        {currentArch.cohesion || 'Medium'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </TabPanel>
+
+                    {/* Recommended Architecture Tab */}
+                    <TabPanel value={tabValue} index={1}>
+                        <div className="space-y-6">
+                            {/* Header */}
+                            <div className="flex items-start gap-4">
+                                <div className="grid place-items-center w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400 shrink-0">
+                                    <TrendingUp className="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white mb-1">
+                                        {recommendedArch.pattern || 'Recommended Modern Architecture'}
+                                    </h3>
+                                    <p className="text-[14px] text-slate-400 leading-[1.6]">
+                                        {recommendedArch.description || 'Modern, scalable architecture pattern'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Architecture Diagram */}
+                            <div className="rounded-2xl border-2 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-atlas-500/10 p-8">
+                                <p className="text-[13px] font-semibold text-center text-emerald-400 mb-6">
+                                    Recommended Modern Architecture
+                                </p>
+                                <div className="flex flex-col gap-6 max-w-2xl mx-auto">
+                                    {recommendedArch.layers && recommendedArch.layers.length > 0 ? (
+                                        recommendedArch.layers.map((layer: string, index: number) => (
+                                            <div key={index} className="relative">
+                                                <div className="rounded-xl border-2 border-emerald-500 bg-ink-800 p-4 text-center font-semibold text-white shadow-lg shadow-emerald-500/20">
+                                                    {layer}
+                                                </div>
+                                                {index < recommendedArch.layers.length - 1 && (
+                                                    <div className="flex justify-center my-2">
+                                                        <ArrowDown className="w-5 h-5 text-emerald-400" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-center text-slate-400 text-[14px]">
+                                            Generating recommendations...
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Benefits */}
+                            {recommendedArch.benefits && recommendedArch.benefits.length > 0 && (
+                                <div>
+                                    <h4 className="text-[15px] font-semibold text-emerald-400 mb-3">Benefits:</h4>
+                                    <div className="space-y-2">
+                                        {recommendedArch.benefits.map((benefit: string, index: number) => (
+                                            <div
+                                                key={index}
+                                                className="flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3"
+                                            >
+                                                <CheckCircle className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                                                <p className="text-[13px] text-slate-300 leading-[1.6]">{benefit}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Impact Alert */}
+                            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+                                <div className="flex items-start gap-3">
+                                    <Zap className="w-5 h-5 text-emerald-400 mt-0.5 shrink-0" />
+                                    <div>
+                                        <h4 className="text-[14px] font-semibold text-white mb-2">
+                                            Modernization Impact
+                                        </h4>
+                                        <p className="text-[13px] text-slate-300 leading-[1.6]">
+                                            Adopting this architecture will improve testability, maintainability, and
+                                            scalability while reducing technical debt and making your system more
+                                            adaptable to future changes.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </TabPanel>
+
+                    {/* Migration Path Tab */}
+                    <TabPanel value={tabValue} index={2}>
+                        <div className="space-y-6">
+                            <h3 className="text-xl font-bold text-white">Migration Steps</h3>
+
+                            {recommendedArch.migration_steps && recommendedArch.migration_steps.length > 0 ? (
+                                <div className="space-y-3">
+                                    {recommendedArch.migration_steps.map((step: string, index: number) => (
+                                        <div
+                                            key={index}
+                                            className={`flex items-start gap-4 rounded-xl border border-white/[0.07] p-4 ${index % 2 === 0 ? 'bg-ink-900/50' : 'bg-ink-800/30'
+                                                }`}
+                                        >
+                                            <div className="grid place-items-center w-8 h-8 rounded-full bg-gradient-to-br from-atlas-400 to-indigo-500 text-white font-semibold text-[14px] shrink-0">
+                                                {index + 1}
+                                            </div>
+                                            <p className="text-[14px] text-slate-300 leading-[1.6] pt-1">{step}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="rounded-xl border border-atlas-500/30 bg-atlas-500/10 p-4 flex items-start gap-3">
+                                    <Target className="w-5 h-5 text-atlas-400 mt-0.5 shrink-0" />
+                                    <p className="text-[13px] text-slate-300">
+                                        Visit the Migration Roadmap tab for a detailed step-by-step migration plan.
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="h-px bg-white/10 my-6" />
+
+                            {/* Before & After Comparison */}
+                            <div>
+                                <h4 className="text-[16px] font-semibold text-white mb-4">
+                                    Before & After Comparison
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Current State */}
+                                    <div className="rounded-2xl border-2 border-amber-500/30 bg-amber-500/5 p-5">
+                                        <h5 className="text-[14px] font-semibold text-amber-400 mb-4">
+                                            Current State
+                                        </h5>
+                                        <ul className="space-y-2">
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <span className="text-amber-400 mt-1">•</span>
+                                                <span>High coupling between components</span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <span className="text-amber-400 mt-1">•</span>
+                                                <span>Difficult to test</span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <span className="text-amber-400 mt-1">•</span>
+                                                <span>Hard to maintain</span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <span className="text-amber-400 mt-1">•</span>
+                                                <span>Limited scalability</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    {/* Future State */}
+                                    <div className="rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/5 p-5">
+                                        <h5 className="text-[14px] font-semibold text-emerald-400 mb-4">
+                                            Future State
+                                        </h5>
+                                        <ul className="space-y-2">
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <CheckCircle className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+                                                <span>Low coupling, high cohesion</span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <CheckCircle className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+                                                <span>Highly testable</span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <CheckCircle className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+                                                <span>Easy to maintain and extend</span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-[13px] text-slate-300">
+                                                <CheckCircle className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+                                                <span>Highly scalable</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </TabPanel>
+                </div>
+            </div>
+
+            {/* Detected Layers */}
+            {architecture?.layers && architecture.layers.length > 0 && (
+                <div className="mt-6 rounded-2xl border border-white/[0.07] bg-ink-800/40 p-6">
+                    <h3 className="text-[16px] font-semibold text-white mb-4">Detected Layers</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {architecture.layers.map((layer: string, index: number) => (
+                            <span
+                                key={index}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-atlas-400/30 bg-atlas-500/10 text-[13px] font-medium text-atlas-300"
+                            >
+                                <Layers className="w-3.5 h-3.5" />
+                                {layer}
+                            </span>
+                        ))}
+                    </div>
+                </div>
             )}
-
-            {/* Metrics */}
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Paper elevation={0} sx={{ p: 2, border: '1px solid #e0e0e0', textAlign: 'center' }}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Coupling Level
-                  </Typography>
-                  <Chip
-                    label={currentArch.coupling || 'Medium'}
-                    color={currentArch.coupling === 'high' ? 'error' : 'warning'}
-                    sx={{ mt: 1, textTransform: 'capitalize' }}
-                  />
-                </Paper>
-              </Grid>
-              <Grid item xs={6}>
-                <Paper elevation={0} sx={{ p: 2, border: '1px solid #e0e0e0', textAlign: 'center' }}>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Cohesion Level
-                  </Typography>
-                  <Chip
-                    label={currentArch.cohesion || 'Medium'}
-                    color={currentArch.cohesion === 'low' ? 'error' : 'success'}
-                    sx={{ mt: 1, textTransform: 'capitalize' }}
-                  />
-                </Paper>
-              </Grid>
-            </Grid>
-          </Box>
-        </TabPanel>
-
-        {/* Recommended Architecture Tab */}
-        <TabPanel value={tabValue} index={1}>
-          <Box sx={{ p: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <ImprovementIcon sx={{ fontSize: 40, color: '#4caf50' }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {recommendedArch.pattern || 'Recommended Modern Architecture'}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {recommendedArch.description || 'Modern, scalable architecture pattern'}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Recommended Architecture Diagram */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 4,
-                mb: 3,
-                background: 'linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%)',
-                border: '2px solid #4caf50',
-                borderRadius: 2
-              }}
-            >
-              <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 600, textAlign: 'center', color: '#4caf50' }}>
-                Recommended Modern Architecture
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 600, margin: '0 auto' }}>
-                {recommendedArch.layers && recommendedArch.layers.length > 0 ? (
-                  recommendedArch.layers.map((layer: string, index: number) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 2,
-                        backgroundColor: 'white',
-                        border: '2px solid #4caf50',
-                        borderRadius: 1,
-                        textAlign: 'center',
-                        fontWeight: 600,
-                        position: 'relative',
-                        boxShadow: '0 2px 8px rgba(76, 175, 80, 0.2)'
-                      }}
-                    >
-                      {layer}
-                      {index < recommendedArch.layers.length - 1 && (
-                        <ArrowIcon
-                          sx={{
-                            position: 'absolute',
-                            bottom: -24,
-                            left: '50%',
-                            transform: 'translateX(-50%) rotate(90deg)',
-                            color: '#4caf50'
-                          }}
-                        />
-                      )}
-                    </Box>
-                  ))
-                ) : (
-                  <Typography color="text.secondary" textAlign="center">
-                    Generating recommendations...
-                  </Typography>
-                )}
-              </Box>
-            </Paper>
-
-            {/* Benefits */}
-            {recommendedArch.benefits && recommendedArch.benefits.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#4caf50' }}>
-                  Benefits:
-                </Typography>
-                <List>
-                  {recommendedArch.benefits.map((benefit: string, index: number) => (
-                    <ListItem key={index}>
-                      <ListItemIcon>
-                        <CheckIcon sx={{ color: '#4caf50' }} />
-                      </ListItemIcon>
-                      <ListItemText primary={benefit} />
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            )}
-
-            <Alert severity="success" sx={{ mt: 3 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                Modernization Impact
-              </Typography>
-              <Typography variant="body2">
-                Adopting this architecture will improve testability, maintainability, and scalability while
-                reducing technical debt and making your system more adaptable to future changes.
-              </Typography>
-            </Alert>
-          </Box>
-        </TabPanel>
-
-        {/* Migration Path Tab */}
-        <TabPanel value={tabValue} index={2}>
-          <Box sx={{ p: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-              Migration Steps
-            </Typography>
-
-            {recommendedArch.migration_steps && recommendedArch.migration_steps.length > 0 ? (
-              <List>
-                {recommendedArch.migration_steps.map((step: string, index: number) => (
-                  <ListItem
-                    key={index}
-                    sx={{
-                      mb: 2,
-                      backgroundColor: index % 2 === 0 ? '#f5f5f5' : 'white',
-                      borderRadius: 1,
-                      border: '1px solid #e0e0e0'
-                    }}
-                  >
-                    <ListItemIcon>
-                      <Box
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: '50%',
-                          backgroundColor: '#667eea',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 600
-                        }}
-                      >
-                        {index + 1}
-                      </Box>
-                    </ListItemIcon>
-                    <ListItemText primary={step} />
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Alert severity="info">
-                Visit the Migration Roadmap tab for a detailed step-by-step migration plan.
-              </Alert>
-            )}
-
-            <Divider sx={{ my: 3 }} />
-
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-              Before & After Comparison
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Paper elevation={0} sx={{ p: 3, border: '2px solid #ff9800', borderRadius: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#ff9800' }}>
-                    Current State
-                  </Typography>
-                  <List dense>
-                    <ListItem>
-                      <ListItemText primary="High coupling between components" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Difficult to test" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Hard to maintain" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Limited scalability" />
-                    </ListItem>
-                  </List>
-                </Paper>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Paper elevation={0} sx={{ p: 3, border: '2px solid #4caf50', borderRadius: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, color: '#4caf50' }}>
-                    Future State
-                  </Typography>
-                  <List dense>
-                    <ListItem>
-                      <ListItemText primary="Low coupling, high cohesion" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Highly testable" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Easy to maintain and extend" />
-                    </ListItem>
-                    <ListItem>
-                      <ListItemText primary="Highly scalable" />
-                    </ListItem>
-                  </List>
-                </Paper>
-              </Grid>
-            </Grid>
-          </Box>
-        </TabPanel>
-      </Paper>
-
-      {/* Layers Information */}
-      {architecture?.layers && architecture.layers.length > 0 && (
-        <Paper elevation={0} sx={{ p: 3, mt: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-            Detected Layers
-          </Typography>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {architecture.layers.map((layer: string, index: number) => (
-              <Chip
-                key={index}
-                label={layer}
-                icon={<ArchIcon />}
-                variant="outlined"
-                sx={{ fontWeight: 500 }}
-              />
-            ))}
-          </Box>
-        </Paper>
-      )}
-    </Box>
-  )
+        </div>
+    );
 }

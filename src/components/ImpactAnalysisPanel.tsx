@@ -1,239 +1,261 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react';
+import axios from 'axios';
 import {
-  Box,
-  Typography,
-  CircularProgress,
-  Button,
-  Paper,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  FormGroup,
-  Chip,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText
-} from '@mui/material'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import WarningIcon from '@mui/icons-material/Warning'
-import axios from 'axios'
+  Target,
+  Loader2,
+  Crosshair,
+  Package,
+  CheckCircle2,
+  FlaskConical,
+  TrendingUp,
+  ShieldAlert,
+  Zap,
+} from 'lucide-react';
 
 interface ImpactAnalysisPanelProps {
-  projectId: string
+  projectId: string;
 }
 
-export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelProps) {
-  const [loading, setLoading] = useState(false)
-  const [impact, setImpact] = useState<any>(null)
-  const [changeScope, setChangeScope] = useState('refactoring')
-  const [selectedModules, setSelectedModules] = useState<string[]>(['UserService', 'UserController'])
+interface ImpactData {
+  risk_level: string;
+  estimated_effort: string;
+  testing_scope: string;
+  affected_services: string[];
+  recommendations: string[];
+}
 
-  const modules = ['UserController', 'UserService', 'User', 'Database', 'API Gateway']
+const modules = ['UserController', 'UserService', 'User', 'Database', 'API Gateway'];
+
+const riskTone = (level: string) => {
+  const l = level.toLowerCase();
+  if (l === 'high') return { ring: 'border-rose-500/30', bg: 'from-rose-500/[0.1] to-pink-500/[0.08]', text: 'text-rose-300' };
+  if (l === 'medium') return { ring: 'border-amber-500/30', bg: 'from-amber-500/[0.1] to-yellow-500/[0.08]', text: 'text-amber-300' };
+  return { ring: 'border-emerald-500/30', bg: 'from-emerald-500/[0.1] to-green-500/[0.08]', text: 'text-emerald-300' };
+};
+
+const effortTone = (effort: string) => {
+  const e = effort.toLowerCase();
+  if (e.includes('high') || e.includes('large') || e.includes('month')) return 'text-rose-300';
+  if (e.includes('medium') || e.includes('week')) return 'text-amber-300';
+  return 'text-emerald-300';
+};
+
+export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelProps) {
+  const [loading, setLoading] = useState(false);
+  const [impact, setImpact] = useState<ImpactData | null>(null);
+  const [changeScope, setChangeScope] = useState('refactoring');
+  const [selectedModules, setSelectedModules] = useState<string[]>(['UserService', 'UserController']);
 
   const handleModuleToggle = (module: string) => {
-    setSelectedModules(prev =>
-      prev.includes(module)
-        ? prev.filter(m => m !== module)
-        : [...prev, module]
-    )
-  }
+    setSelectedModules((prev) =>
+      prev.includes(module) ? prev.filter((m) => m !== module) : [...prev, module],
+    );
+  };
 
   const handleAnalyze = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await axios.post(`https://legacy-code-backend.onrender.com/impact`, {
+      const response = await axios.post<ImpactData>('https://legacy-code-backend.onrender.com/impact', {
         project_id: projectId,
         change_scope: changeScope,
-        affected_modules: selectedModules
-      })
-      setImpact(response.data)
+        affected_modules: selectedModules,
+      });
+      setImpact(response.data);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <Box>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: 1,
-          fontWeight: 700,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent'
-        }}
-      >
-        Impact Analysis
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-        Simulate the impact of changes on your application architecture
-      </Typography>
+    <div className="mx-auto max-w-4xl">
+      {/* Header */}
+      <div className="mb-7">
+        <span className="inline-flex items-center gap-2 text-atlas-400 text-[12.5px] font-semibold tracking-[0.08em] uppercase">
+          <span className="w-6 h-px bg-atlas-400/50" />
+          Impact Analysis
+          <span className="w-6 h-px bg-atlas-400/50" />
+        </span>
+        <h2 className="mt-3 flex items-center gap-3 text-2xl sm:text-[2.2rem] font-bold tracking-[-0.02em] leading-tight">
+          <Target className="w-7 h-7 text-atlas-400" />
+          Impact Analysis
+        </h2>
+        <p className="mt-2 text-slate-400 text-[14px]">
+          Simulate the impact of changes on your application architecture
+        </p>
+      </div>
 
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          mb: 3,
-          borderRadius: 3,
-          background: 'rgba(255, 255, 255, 0.7)',
-          border: '1px solid rgba(0, 0, 0, 0.08)'
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>🎯 Define Change Scope</Typography>
-        <TextField
-          select
-          fullWidth
-          value={changeScope}
-          onChange={(e) => setChangeScope(e.target.value)}
-          SelectProps={{ native: true }}
-          sx={{
-            mb: 3,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2
-            }
-          }}
-        >
-          <option value="bug-fix">Bug Fix</option>
-          <option value="feature">Feature Addition</option>
-          <option value="refactoring">Refactoring</option>
-          <option value="migration">Migration</option>
-        </TextField>
+      {/* Control Panel */}
+      <div className="rounded-2xl border border-white/[0.07] bg-ink-800/40 p-6 mb-6">
+        {/* Change Scope */}
+        <div className="flex items-center gap-2.5 mb-4">
+          <Crosshair className="w-5 h-5 text-atlas-300" />
+          <h3 className="font-semibold text-[15px]">Define Change Scope</h3>
+        </div>
 
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>📦 Affected Modules</Typography>
-        <FormGroup sx={{ mb: 3, pl: 1 }}>
-          {modules.map(module => (
-            <FormControlLabel
-              key={module}
-              control={
-                <Checkbox
-                  checked={selectedModules.includes(module)}
-                  onChange={() => handleModuleToggle(module)}
-                  sx={{
-                    '&.Mui-checked': {
-                      color: '#667eea'
-                    }
-                  }}
-                />
-              }
-              label={<Typography sx={{ fontWeight: 500 }}>{module}</Typography>}
-            />
-          ))}
-        </FormGroup>
+        <div className="relative mb-6">
+          <select
+            value={changeScope}
+            onChange={(e) => setChangeScope(e.target.value)}
+            className="w-full appearance-none rounded-xl border border-white/10 bg-ink-700/60 px-4 py-3 pr-10 text-[14px] text-white focus:border-atlas-400/50 focus:outline-none focus:ring-2 focus:ring-atlas-500/20 transition-all duration-300 capitalize cursor-pointer"
+          >
+            <option value="bug-fix">Bug Fix</option>
+            <option value="feature">Feature Addition</option>
+            <option value="refactoring">Refactoring</option>
+            <option value="migration">Migration</option>
+          </select>
+          <svg
+            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
 
-        <Button
-          variant="contained"
+        {/* Affected Modules */}
+        <div className="flex items-center gap-2.5 mb-4">
+          <Package className="w-5 h-5 text-atlas-300" />
+          <h3 className="font-semibold text-[15px]">Affected Modules</h3>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-6 pl-1">
+          {modules.map((module) => {
+            const checked = selectedModules.includes(module);
+            return (
+              <button
+                key={module}
+                onClick={() => handleModuleToggle(module)}
+                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-300 ${
+                  checked
+                    ? 'border-atlas-400/40 bg-atlas-500/[0.08]'
+                    : 'border-white/10 bg-ink-700/30 hover:border-white/20'
+                }`}
+              >
+                <span
+                  className={`grid place-items-center w-5 h-5 rounded-md border transition-all duration-300 ${
+                    checked ? 'border-atlas-400 bg-atlas-400 text-white' : 'border-white/25 text-transparent'
+                  }`}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                </span>
+                <span className={`text-[14px] font-medium ${checked ? 'text-white' : 'text-slate-400'}`}>
+                  {module}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Analyze Button */}
+        <button
           onClick={handleAnalyze}
           disabled={loading || selectedModules.length === 0}
-          fullWidth
-          size="large"
-          sx={{
-            py: 1.5,
-            fontWeight: 600,
-            borderRadius: 2,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #5568d3 0%, #6b3f8e 100%)'
-            }
-          }}
+          className={`group w-full inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[15px] px-6 py-4 transition-all duration-300 ${
+            loading || selectedModules.length === 0
+              ? 'bg-ink-700 text-slate-500 cursor-not-allowed'
+              : 'bg-gradient-to-r from-atlas-400 to-indigo-500 text-white glow-cyan hover:brightness-110'
+          }`}
         >
-          {loading ? <CircularProgress size={24} /> : 'Analyze Impact'}
-        </Button>
-      </Paper>
+          {loading ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              Analyzing…
+            </>
+          ) : (
+            <>
+              <Zap className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+              Analyze Impact
+            </>
+          )}
+        </button>
+      </div>
 
+      {/* Results */}
       {impact && (
-        <>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              mb: 3,
-              borderRadius: 3,
-              background: 'rgba(255, 255, 255, 0.7)',
-              border: '1px solid rgba(0, 0, 0, 0.08)'
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>📈 Impact Summary</Typography>
-            <Box sx={{ display: 'flex', gap: 3, mb: 4, justifyContent: 'center' }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 3,
-                  textAlign: 'center',
-                  flex: 1,
-                  background: impact?.risk_level === 'high'
-                    ? 'linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(233, 30, 99, 0.1) 100%)'
-                    : impact?.risk_level === 'medium'
-                      ? 'linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 193, 7, 0.1) 100%)'
-                      : 'linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(139, 195, 74, 0.1) 100%)',
-                  border: '1px solid',
-                  borderColor: impact?.risk_level === 'high' ? 'rgba(244, 67, 54, 0.3)' : impact?.risk_level === 'medium' ? 'rgba(255, 152, 0, 0.3)' : 'rgba(76, 175, 80, 0.3)',
-                  borderRadius: 2
-                }}
-              >
-                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, textTransform: 'uppercase' }}>
-                  {impact?.risk_level}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 500 }}>Risk Level</Typography>
-              </Paper>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 3,
-                  textAlign: 'center',
-                  flex: 1,
-                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
-                  border: '1px solid rgba(102, 126, 234, 0.3)',
-                  borderRadius: 2
-                }}
-              >
-                <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, textTransform: 'uppercase' }}>
-                  {impact?.estimated_effort}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 500 }}>Estimated Effort</Typography>
-              </Paper>
-            </Box>
+        <div className="rounded-2xl border border-white/[0.07] bg-ink-800/40 p-6">
+          <div className="flex items-center gap-2.5 mb-5">
+            <TrendingUp className="w-5 h-5 text-atlas-300" />
+            <h3 className="font-semibold text-[15px]">Impact Summary</h3>
+          </div>
 
-            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>🧪 Testing Scope:</Typography>
-            <Typography variant="body1" sx={{ mb: 3, p: 2, background: 'rgba(102, 126, 234, 0.05)', borderRadius: 2 }}>
-              {impact?.testing_scope}
-            </Typography>
+          {/* Risk + Effort Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div
+              className={`rounded-2xl border bg-gradient-to-br ${riskTone(impact.risk_level).ring} ${riskTone(impact.risk_level).bg} p-6 text-center`}
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <ShieldAlert className="w-5 h-5 opacity-70" />
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Risk Level</span>
+              </div>
+              <div className={`text-2xl sm:text-[1.8rem] font-extrabold uppercase ${riskTone(impact.risk_level).text}`}>
+                {impact.risk_level}
+              </div>
+            </div>
 
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>📦 Affected Services:</Typography>
-            <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {impact?.affected_services?.map((service: string) => (
-                <Chip
-                  key={service}
-                  label={service}
-                  sx={{
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    color: 'white',
-                    fontWeight: 500
-                  }}
-                />
-              ))}
-            </Box>
+            <div className="rounded-2xl border border-atlas-500/30 bg-gradient-to-br from-atlas-500/[0.1] to-indigo-500/[0.08] p-6 text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Zap className="w-5 h-5 opacity-70 text-atlas-300" />
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Estimated Effort</span>
+              </div>
+              <div className={`text-2xl sm:text-[1.8rem] font-extrabold uppercase ${effortTone(impact.estimated_effort)}`}>
+                {impact.estimated_effort}
+              </div>
+            </div>
+          </div>
 
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>✅ Recommendations:</Typography>
-            <List sx={{ background: 'rgba(76, 175, 80, 0.03)', borderRadius: 2, p: 1 }}>
-              {impact?.recommendations?.map((rec: string, idx: number) => (
-                <ListItem key={idx} sx={{ py: 1 }}>
-                  <ListItemIcon>
-                    <CheckCircleIcon sx={{ color: '#4caf50' }} />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={rec}
-                    primaryTypographyProps={{ fontWeight: 500 }}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        </>
+          {/* Testing Scope */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2.5 mb-2.5">
+              <FlaskConical className="w-4 h-4 text-atlas-300" />
+              <p className="font-semibold text-[14px]">Testing Scope</p>
+            </div>
+            <div className="rounded-xl bg-atlas-500/[0.05] border border-atlas-500/15 px-4 py-3.5">
+              <p className="text-[14px] text-slate-300 leading-[1.65]">{impact.testing_scope}</p>
+            </div>
+          </div>
+
+          {/* Affected Services */}
+          {impact.affected_services?.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <Package className="w-4 h-4 text-atlas-300" />
+                <p className="font-semibold text-[14px]">Affected Services</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {impact.affected_services.map((service) => (
+                  <span
+                    key={service}
+                    className="inline-flex items-center rounded-lg bg-gradient-to-r from-atlas-500/15 to-indigo-500/15 border border-atlas-400/20 text-atlas-200 px-3 py-1.5 text-[12.5px] font-medium"
+                  >
+                    {service}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Recommendations */}
+          {impact.recommendations?.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2.5 mb-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <p className="font-semibold text-[14px]">Recommendations</p>
+              </div>
+              <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4 space-y-2.5">
+                {impact.recommendations.map((rec, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                    <p className="text-[13.5px] text-slate-300 leading-[1.6] font-medium">{rec}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       )}
-    </Box>
-  )
+    </div>
+  );
 }

@@ -1,0 +1,28 @@
+import { useEffect, useRef, useState } from 'react';
+
+/**
+ * Reveal-on-scroll hook. Add the returned ref to any element and
+ * it will fade-up into view once it enters the viewport.
+ */
+export function useReveal<T extends HTMLElement = HTMLDivElement>() {
+  const ref = useRef<T>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, visible };
+}
