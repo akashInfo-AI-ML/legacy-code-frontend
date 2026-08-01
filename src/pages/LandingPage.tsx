@@ -11,7 +11,7 @@ import Footer from '@/components/Footer';
 
 export default function LandingPage() {
   return (
-    <div className="bg-ink-950 text-white min-h-screen noise">
+    <div className="relative bg-gradient-to-b from-ink-950 via-ink-900 to-ink-950 text-white min-h-screen overflow-x-hidden">
       <Navbar />
       <Hero />
       <ProblemSection />

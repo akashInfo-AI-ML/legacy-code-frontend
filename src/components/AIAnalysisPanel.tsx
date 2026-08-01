@@ -24,11 +24,18 @@ interface BusinessCapability {
   modules: string[];
 }
 
+interface AntiPattern {
+  name: string;
+  description: string;
+  severity: string;
+  impact: string;
+}
+
 interface AnalysisData {
   summary: string;
   business_capabilities: BusinessCapability[];
   patterns_detected: string[];
-  anti_patterns: string[];
+  anti_patterns: (AntiPattern | string)[];
 }
 
 export default function AIAnalysisPanel({ projectId }: AIAnalysisPanelProps) {
@@ -132,11 +139,10 @@ export default function AIAnalysisPanel({ projectId }: AIAnalysisPanelProps) {
           return (
             <div
               key={cap.id}
-              className={`rounded-2xl border transition-all duration-400 ease-smooth overflow-hidden ${
-                isOpen
-                  ? 'border-atlas-400/30 bg-ink-800/70'
-                  : 'border-white/[0.07] bg-ink-800/40 hover:border-white/15'
-              }`}
+              className={`rounded-2xl border transition-all duration-400 ease-smooth overflow-hidden ${isOpen
+                ? 'border-atlas-400/30 bg-ink-800/70'
+                : 'border-white/[0.07] bg-ink-800/40 hover:border-white/15'
+                }`}
             >
               <button
                 onClick={() => setOpenCap(isOpen ? null : cap.id)}
@@ -157,9 +163,8 @@ export default function AIAnalysisPanel({ projectId }: AIAnalysisPanelProps) {
               </button>
 
               <div
-                className={`grid transition-all duration-400 ease-smooth ${
-                  isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                }`}
+                className={`grid transition-all duration-400 ease-smooth ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                  }`}
               >
                 <div className="overflow-hidden">
                   <div className="px-5 pb-5 pt-1 border-t border-white/[0.06]">
@@ -168,9 +173,9 @@ export default function AIAnalysisPanel({ projectId }: AIAnalysisPanelProps) {
                       Related Modules
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {cap.modules.map((mod) => (
+                      {cap.modules.map((mod, idx) => (
                         <span
-                          key={mod}
+                          key={`${cap.id}-module-${mod}-${idx}`}
                           className="inline-flex items-center rounded-lg bg-atlas-500/10 text-atlas-300 px-2.5 py-1 text-[12px] font-medium"
                         >
                           {mod}
@@ -199,9 +204,9 @@ export default function AIAnalysisPanel({ projectId }: AIAnalysisPanelProps) {
         </div>
 
         {/* detected patterns */}
-        {analysis?.patterns_detected?.map((pattern) => (
+        {analysis?.patterns_detected?.map((pattern, idx) => (
           <div
-            key={pattern}
+            key={`pattern-${pattern}-${idx}`}
             className="grid grid-cols-2 text-[13.5px] border-t border-white/[0.05] hover:bg-white/[0.015] transition-colors duration-300"
           >
             <div className="p-4 text-slate-200 font-medium">{pattern}</div>
@@ -215,20 +220,44 @@ export default function AIAnalysisPanel({ projectId }: AIAnalysisPanelProps) {
         ))}
 
         {/* anti-patterns */}
-        {analysis?.anti_patterns?.map((pattern) => (
-          <div
-            key={pattern}
-            className="grid grid-cols-2 text-[13.5px] border-t border-white/[0.05] hover:bg-rose-500/[0.03] transition-colors duration-300"
-          >
-            <div className="p-4 text-slate-200 font-medium">{pattern}</div>
-            <div className="p-4 border-l border-white/[0.06]">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/15 text-rose-300 px-2.5 py-0.5 text-[11.5px] font-semibold">
-                <AlertTriangle className="w-3.5 h-3.5" />
-                Anti-pattern
-              </span>
-            </div>
-          </div>
-        ))}
+        {analysis?.anti_patterns?.map((pattern, idx) => {
+          // Handle both string and object formats
+          if (typeof pattern === 'string') {
+            return (
+              <div
+                key={`anti-${idx}`}
+                className="grid grid-cols-2 text-[13.5px] border-t border-white/[0.05] hover:bg-rose-500/[0.03] transition-colors duration-300"
+              >
+                <div className="p-4 text-slate-200 font-medium">{pattern}</div>
+                <div className="p-4 border-l border-white/[0.06]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/15 text-rose-300 px-2.5 py-0.5 text-[11.5px] font-semibold">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    Anti-pattern
+                  </span>
+                </div>
+              </div>
+            );
+          } else {
+            return (
+              <div
+                key={`anti-${pattern.name}-${idx}`}
+                className="grid grid-cols-2 text-[13.5px] border-t border-white/[0.05] hover:bg-rose-500/[0.03] transition-colors duration-300"
+              >
+                <div className="p-4">
+                  <div className="text-slate-200 font-medium mb-1">{pattern.name}</div>
+                  <p className="text-[12px] text-slate-400 leading-relaxed">{pattern.description}</p>
+                </div>
+                <div className="p-4 border-l border-white/[0.06] space-y-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/15 text-rose-300 px-2.5 py-0.5 text-[11.5px] font-semibold">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {pattern.severity}
+                  </span>
+                  <p className="text-[12px] text-slate-400 leading-relaxed">{pattern.impact}</p>
+                </div>
+              </div>
+            );
+          }
+        })}
       </div>
     </div>
   );

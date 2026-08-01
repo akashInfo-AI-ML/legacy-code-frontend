@@ -41,8 +41,7 @@ const navItems: NavItem[] = [
   { id: 4, label: 'Effort', icon: <Clock className="w-4 h-4" />, requiresProject: true },
   { id: 5, label: 'Roadmap', icon: <Map className="w-4 h-4" />, requiresProject: true },
   { id: 6, label: 'Impact', icon: <TrendingUp className="w-4 h-4" />, requiresProject: true },
-  { id: 7, label: 'Health', icon: <Activity className="w-4 h-4" />, requiresProject: true },
-  { id: 8, label: 'Recommendations', shortLabel: 'Rec', icon: <Lightbulb className="w-4 h-4" />, requiresProject: true },
+  { id: 7, label: 'Recommendations', shortLabel: 'Rec', icon: <Lightbulb className="w-4 h-4" />, requiresProject: true },
 ];
 
 export default function AppPage() {
@@ -218,9 +217,7 @@ export default function AppPage() {
 
           {projectId && activeView === 6 && <ImpactAnalysisPanel projectId={projectId} />}
 
-          {projectId && activeView === 7 && <HealthScorePanel projectId={projectId} />}
-
-          {projectId && activeView === 8 && <RecommendationsPanel projectId={projectId} />}
+          {projectId && activeView === 7 && <RecommendationsPanel projectId={projectId} />}
         </div>
       </main>
     </div>

@@ -26,32 +26,36 @@ const problems = [
 
 export default function ProblemSection() {
   return (
-    <section id="problem" className="relative py-24 sm:py-28 border-t border-white/[0.05]">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8">
-        <Reveal className="max-w-2xl">
-          <span className="inline-flex items-center gap-2 text-atlas-400 text-[12.5px] font-semibold tracking-[0.08em] uppercase">
-            <span className="w-6 h-px bg-atlas-400/50" />
+    <section id="problem" className="relative py-28 sm:py-32 border-t border-white/[0.06] overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-rose-500/10 via-red-500/5 to-transparent rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-8">
+        <Reveal className="max-w-3xl mx-auto text-center">
+          <span className="inline-flex items-center gap-2.5 text-rose-400 text-[13px] font-bold tracking-[0.1em] uppercase px-4 py-2 rounded-full border border-rose-400/20 bg-rose-400/5 backdrop-blur-sm">
+            <span className="w-8 h-px bg-gradient-to-r from-transparent via-rose-400 to-transparent" />
             The Problem
+            <span className="w-8 h-px bg-gradient-to-r from-transparent via-rose-400 to-transparent" />
           </span>
-          <h2 className="mt-4 text-3xl sm:text-[2.6rem] font-bold tracking-[-0.02em] leading-[1.12]">
-            Legacy modernization is slow,
-            <br className="hidden sm:block" /> risky, and opaque.
+          <h2 className="mt-6 text-4xl sm:text-5xl md:text-[3.2rem] font-black tracking-[-0.03em] leading-[1.1]">
+            Legacy modernization is{' '}
+            <span className="text-gradient-warm">slow, risky, and opaque</span>
           </h2>
-          <p className="mt-4 text-slate-300/90 text-[17px] leading-[1.65]">
+          <p className="mt-6 text-slate-300 text-[18px] leading-[1.7] font-light">
             Most modernization programs stall in the assessment phase. ATLAS removes that
-            bottleneck with AI that reads, understands, and explains your codebase for you.
+            bottleneck with AI that reads, understands, and explains your codebase instantly.
           </p>
         </Reveal>
 
-        <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {problems.map((p, i) => (
             <Reveal key={i} delay={i * 80}>
-              <div className="group h-full rounded-2xl border border-white/[0.07] bg-ink-800/40 p-6 hover:border-rose-400/25 hover:bg-ink-800/70 transition-all duration-500 ease-smooth">
-                <div className="grid place-items-center w-11 h-11 rounded-xl bg-rose-500/10 text-rose-400/90 group-hover:scale-105 transition-transform duration-500 ease-smooth">
+              <div className="group h-full rounded-2xl border border-white/[0.08] bg-gradient-to-br from-ink-800/60 to-ink-900/40 p-7 hover:border-rose-400/30 hover:bg-gradient-to-br hover:from-ink-800/80 hover:to-ink-900/60 transition-all duration-500 ease-smooth backdrop-blur-sm hover:-translate-y-1 hover:shadow-xl hover:shadow-rose-500/10">
+                <div className="grid place-items-center w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500/15 to-red-500/10 text-rose-400 group-hover:scale-110 group-hover:from-rose-500/25 group-hover:to-red-500/15 transition-all duration-500 ease-smooth border border-rose-400/20">
                   {p.icon}
                 </div>
-                <h3 className="mt-4.5 font-semibold text-[15px] leading-snug">{p.title}</h3>
-                <p className="mt-2 text-[13.5px] text-slate-400 leading-[1.6]">{p.desc}</p>
+                <h3 className="mt-5 font-bold text-[16px] leading-snug text-white">{p.title}</h3>
+                <p className="mt-3 text-[14px] text-slate-400 leading-[1.65]">{p.desc}</p>
               </div>
             </Reveal>
           ))}

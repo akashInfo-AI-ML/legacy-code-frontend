@@ -16,12 +16,34 @@ interface ImpactAnalysisPanelProps {
   projectId: string;
 }
 
+interface TestingScope {
+  unit_tests?: number;
+  integration_tests?: number;
+  regression_tests?: number;
+  performance_tests?: number;
+  estimated_test_effort?: string;
+}
+
+interface AffectedService {
+  name: string;
+  impact_level: string;
+  reason: string;
+  specific_concerns: string[];
+}
+
+interface Recommendation {
+  priority: string;
+  category: string;
+  recommendation: string;
+  rationale: string;
+}
+
 interface ImpactData {
   risk_level: string;
   estimated_effort: string;
-  testing_scope: string;
-  affected_services: string[];
-  recommendations: string[];
+  testing_scope: TestingScope | string;
+  affected_services: AffectedService[] | string[];
+  recommendations: Recommendation[] | string[];
 }
 
 const modules = ['UserController', 'UserService', 'User', 'Database', 'API Gateway'];
@@ -128,16 +150,14 @@ export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelPr
               <button
                 key={module}
                 onClick={() => handleModuleToggle(module)}
-                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-300 ${
-                  checked
+                className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-300 ${checked
                     ? 'border-atlas-400/40 bg-atlas-500/[0.08]'
                     : 'border-white/10 bg-ink-700/30 hover:border-white/20'
-                }`}
+                  }`}
               >
                 <span
-                  className={`grid place-items-center w-5 h-5 rounded-md border transition-all duration-300 ${
-                    checked ? 'border-atlas-400 bg-atlas-400 text-white' : 'border-white/25 text-transparent'
-                  }`}
+                  className={`grid place-items-center w-5 h-5 rounded-md border transition-all duration-300 ${checked ? 'border-atlas-400 bg-atlas-400 text-white' : 'border-white/25 text-transparent'
+                    }`}
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                 </span>
@@ -153,11 +173,10 @@ export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelPr
         <button
           onClick={handleAnalyze}
           disabled={loading || selectedModules.length === 0}
-          className={`group w-full inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[15px] px-6 py-4 transition-all duration-300 ${
-            loading || selectedModules.length === 0
+          className={`group w-full inline-flex items-center justify-center gap-2 rounded-full font-semibold text-[15px] px-6 py-4 transition-all duration-300 ${loading || selectedModules.length === 0
               ? 'bg-ink-700 text-slate-500 cursor-not-allowed'
               : 'bg-gradient-to-r from-atlas-400 to-indigo-500 text-white glow-cyan hover:brightness-110'
-          }`}
+            }`}
         >
           {loading ? (
             <>
@@ -213,7 +232,44 @@ export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelPr
               <p className="font-semibold text-[14px]">Testing Scope</p>
             </div>
             <div className="rounded-xl bg-atlas-500/[0.05] border border-atlas-500/15 px-4 py-3.5">
-              <p className="text-[14px] text-slate-300 leading-[1.65]">{impact.testing_scope}</p>
+              {typeof impact.testing_scope === 'string' ? (
+                <p className="text-[14px] text-slate-300 leading-[1.65]">{impact.testing_scope}</p>
+              ) : (
+                <div className="space-y-2">
+                  {impact.testing_scope.unit_tests !== undefined && (
+                    <div className="flex items-center justify-between text-[13.5px]">
+                      <span className="text-slate-400">Unit Tests</span>
+                      <span className="text-white font-semibold">{impact.testing_scope.unit_tests}</span>
+                    </div>
+                  )}
+                  {impact.testing_scope.integration_tests !== undefined && (
+                    <div className="flex items-center justify-between text-[13.5px]">
+                      <span className="text-slate-400">Integration Tests</span>
+                      <span className="text-white font-semibold">{impact.testing_scope.integration_tests}</span>
+                    </div>
+                  )}
+                  {impact.testing_scope.regression_tests !== undefined && (
+                    <div className="flex items-center justify-between text-[13.5px]">
+                      <span className="text-slate-400">Regression Tests</span>
+                      <span className="text-white font-semibold">{impact.testing_scope.regression_tests}</span>
+                    </div>
+                  )}
+                  {impact.testing_scope.performance_tests !== undefined && (
+                    <div className="flex items-center justify-between text-[13.5px]">
+                      <span className="text-slate-400">Performance Tests</span>
+                      <span className="text-white font-semibold">{impact.testing_scope.performance_tests}</span>
+                    </div>
+                  )}
+                  {impact.testing_scope.estimated_test_effort && (
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                      <div className="flex items-center justify-between text-[13.5px]">
+                        <span className="text-slate-400">Estimated Test Effort</span>
+                        <span className="text-atlas-300 font-semibold">{impact.testing_scope.estimated_test_effort}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -224,15 +280,53 @@ export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelPr
                 <Package className="w-4 h-4 text-atlas-300" />
                 <p className="font-semibold text-[14px]">Affected Services</p>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {impact.affected_services.map((service) => (
-                  <span
-                    key={service}
-                    className="inline-flex items-center rounded-lg bg-gradient-to-r from-atlas-500/15 to-indigo-500/15 border border-atlas-400/20 text-atlas-200 px-3 py-1.5 text-[12.5px] font-medium"
-                  >
-                    {service}
-                  </span>
-                ))}
+              <div className="space-y-3">
+                {impact.affected_services.map((service, idx) => {
+                  if (typeof service === 'string') {
+                    return (
+                      <span
+                        key={`service-${idx}`}
+                        className="inline-flex items-center rounded-lg bg-gradient-to-r from-atlas-500/15 to-indigo-500/15 border border-atlas-400/20 text-atlas-200 px-3 py-1.5 text-[12.5px] font-medium mr-2"
+                      >
+                        {service}
+                      </span>
+                    );
+                  } else {
+                    const impactLevelColor = service.impact_level?.toLowerCase() === 'high'
+                      ? 'border-rose-400/30 bg-rose-500/[0.08]'
+                      : service.impact_level?.toLowerCase() === 'medium'
+                        ? 'border-amber-400/30 bg-amber-500/[0.08]'
+                        : 'border-emerald-400/30 bg-emerald-500/[0.08]';
+
+                    return (
+                      <div
+                        key={`service-${service.name}-${idx}`}
+                        className={`rounded-xl border ${impactLevelColor} p-4`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-semibold text-[14px] text-white">{service.name}</h4>
+                          <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded-full bg-white/10">
+                            {service.impact_level}
+                          </span>
+                        </div>
+                        <p className="text-[13px] text-slate-300 mb-2">{service.reason}</p>
+                        {service.specific_concerns?.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-white/10">
+                            <p className="text-[11px] text-slate-400 uppercase tracking-wider mb-1.5">Concerns:</p>
+                            <ul className="space-y-1">
+                              {service.specific_concerns.map((concern, cIdx) => (
+                                <li key={`concern-${idx}-${cIdx}`} className="text-[12px] text-slate-300 flex items-start gap-1.5">
+                                  <span className="text-atlas-400 mt-0.5">•</span>
+                                  {concern}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
           )}
@@ -244,13 +338,49 @@ export default function ImpactAnalysisPanel({ projectId }: ImpactAnalysisPanelPr
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <p className="font-semibold text-[14px]">Recommendations</p>
               </div>
-              <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4 space-y-2.5">
-                {impact.recommendations.map((rec, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
-                    <p className="text-[13.5px] text-slate-300 leading-[1.6] font-medium">{rec}</p>
-                  </div>
-                ))}
+              <div className="space-y-3">
+                {impact.recommendations.map((rec, idx) => {
+                  if (typeof rec === 'string') {
+                    return (
+                      <div key={`rec-${idx}`} className="flex items-start gap-2.5 rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                        <p className="text-[13.5px] text-slate-300 leading-[1.6] font-medium">{rec}</p>
+                      </div>
+                    );
+                  } else {
+                    const priorityColor = rec.priority?.toLowerCase() === 'high'
+                      ? 'text-rose-400 bg-rose-500/15'
+                      : rec.priority?.toLowerCase() === 'medium'
+                        ? 'text-amber-400 bg-amber-500/15'
+                        : 'text-emerald-400 bg-emerald-500/15';
+
+                    return (
+                      <div
+                        key={`rec-${idx}`}
+                        className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <h4 className="font-semibold text-[14px] text-white flex-1">{rec.recommendation}</h4>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {rec.priority && (
+                              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${priorityColor}`}>
+                                {rec.priority}
+                              </span>
+                            )}
+                            {rec.category && (
+                              <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-atlas-500/15 text-atlas-300">
+                                {rec.category}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {rec.rationale && (
+                          <p className="text-[13px] text-slate-400 leading-[1.6] mt-2">{rec.rationale}</p>
+                        )}
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
           )}
