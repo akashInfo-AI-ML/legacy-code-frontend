@@ -126,10 +126,10 @@ export default function UploadComponent({ onSuccess, onError }: UploadComponentP
           </span>
         </div>
         <h2 className="text-3xl sm:text-[2.75rem] font-bold tracking-[-0.02em] leading-[1.1] bg-gradient-to-br from-white via-white to-slate-400 bg-clip-text text-transparent">
-          Upload your .NET solution
+          Upload solution
         </h2>
         <p className="mt-4 text-slate-400 text-[15.5px] leading-[1.7] max-w-2xl mx-auto">
-          Begin your modernization journey by uploading your .NET solution file or source code.
+          Begin your modernization journey by uploading solution file or source code.
           Our AI-powered engine will analyze the architecture and provide comprehensive insights in seconds.
         </p>
       </div>
